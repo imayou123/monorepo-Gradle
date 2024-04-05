@@ -1,0 +1,72 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master # the name of your main branch
+    paths:
+      - 'apps/account-app/**' # the paths to your monorepo projects from the monorepo root directory
+      - 'apps/inventory-app/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarQubeScan1:
+    name: sonarQube Scan 1
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: sonarQube Scan 1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_1 }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: ./gradlew build sonar -Dsonar.projectBaseDir=apps/account-app --info # the path to your project from the monorepo root directory  
+  sonarQubeScan2:
+    name: sonarQubeScan2
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Cache SonarQube packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Gradle packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: sonarQube Scan 2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_2 }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: ./gradlew build sonar --info -Dsonar.projectBaseDir=apps/inventory-app
+  # Add other scan jobs if you wish to scan more projects in the monorepo 
