@@ -13,6 +13,8 @@ plugins {
 
     // Create shadow jar
     id("com.github.johnrengelman.shadow") version "4.0.4"
+
+    id("org.sonarqube") version "5.0.0.4638"
 }
 
 repositories {
@@ -46,4 +48,12 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
+}
+
+    
+sonar {
+  properties {
+    property("sonar.projectKey", "imayou123_monorepo-Gradle_projectB")
+    property("sonar.projectName", "imayou123_monorepo-Gradle_projectB")
+  }
 }
